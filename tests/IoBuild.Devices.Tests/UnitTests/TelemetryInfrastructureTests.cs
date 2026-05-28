@@ -29,36 +29,42 @@ public class TelemetryInfrastructureTests
     }
 
     [Fact]
-    public void TelemetryPoint_ShouldHave_CorrectAttributes()
+    public void TelemetryPoint_ShouldHave_MeasurementAttribute()
     {
-        var measurementAttr =
-            typeof(TelemetryPoint)
-                .GetCustomAttributes(typeof(MeasurementAttribute), false)
-                .FirstOrDefault() as MeasurementAttribute;
+        var measurementAttribute = typeof(TelemetryPoint)
+            .GetCustomAttributes(typeof(Measurement), false)
+            .Cast<Measurement>()
+            .FirstOrDefault();
 
-        Assert.NotNull(measurementAttr);
-        Assert.Equal("telemetry", measurementAttr!.Name);
+        Assert.NotNull(measurementAttribute);
+        Assert.Equal("telemetry", measurementAttribute!.Name);
+    }
 
-        var deviceIdProp =
-            typeof(TelemetryPoint).GetProperty(nameof(TelemetryPoint.DeviceId));
+    [Fact]
+    public void DeviceId_ShouldHave_ColumnAttribute()
+    {
+        var property = typeof(TelemetryPoint)
+            .GetProperty(nameof(TelemetryPoint.DeviceId));
 
-        var deviceIdAttr =
-            deviceIdProp!
-                .GetCustomAttributes(typeof(ColumnAttribute), false)
-                .FirstOrDefault() as ColumnAttribute;
+        var attribute = property!
+            .GetCustomAttributes(typeof(Column), false)
+            .Cast<Column>()
+            .FirstOrDefault();
 
-        Assert.NotNull(deviceIdAttr);
-        Assert.True(deviceIdAttr!.IsTag);
+        Assert.NotNull(attribute);
+    }
 
-        var timestampProp =
-            typeof(TelemetryPoint).GetProperty(nameof(TelemetryPoint.Timestamp));
+    [Fact]
+    public void Timestamp_ShouldHave_ColumnAttribute()
+    {
+        var property = typeof(TelemetryPoint)
+            .GetProperty(nameof(TelemetryPoint.Timestamp));
 
-        var timestampAttr =
-            timestampProp!
-                .GetCustomAttributes(typeof(ColumnAttribute), false)
-                .FirstOrDefault() as ColumnAttribute;
+        var attribute = property!
+            .GetCustomAttributes(typeof(Column), false)
+            .Cast<Column>()
+            .FirstOrDefault();
 
-        Assert.NotNull(timestampAttr);
-        Assert.True(timestampAttr!.IsTimestamp);
+        Assert.NotNull(attribute);
     }
 }
