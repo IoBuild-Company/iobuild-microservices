@@ -1,20 +1,20 @@
 using InfluxDB.Client;
 using InfluxDB.Client.Api.Domain;
 using InfluxDB.Client.Writes;
+using Microsoft.Extensions.Options;
 
 namespace IoBuild.Devices.Infrastructure.InfluxDB;
 
-public class TelemetryWriteService : ITelemetryWriteService
+public class TelemetryWriteService : ITelemetryWriteService, IDisposable
 {
     private readonly InfluxDBClient _client;
     private readonly InfluxDbOptions _options;
 
-    public TelemetryWriteService(
-        InfluxDBClient client,
-        InfluxDbOptions options)
+    public TelemetryWriteService(IOptions<InfluxDbOptions> options)
     {
-        _client = client;
-        _options = options;
+        _options = options.Value;
+        var url = $"http://{_options.Host}:{_options.Port}";
+        _client = new InfluxDBClient(url, _options.Token);
     }
 
     public async Task WriteAsync(
@@ -41,5 +41,10 @@ public class TelemetryWriteService : ITelemetryWriteService
             _options.Org);
 
         await Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _client?.Dispose();
     }
 }
